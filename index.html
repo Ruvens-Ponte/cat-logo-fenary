@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -9,7 +8,6 @@
     body { font-family: Arial, sans-serif; padding: 1rem; margin: 0; background: #f9f9f9; }
     header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
     .modo-btn { padding: 0.5rem 1rem; background: black; color: white; border: none; cursor: pointer; border-radius: 8px; margin-top: 1rem; }
-    .upload-area { margin-top: 1rem; }
     .produtos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
     .produto { background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .produto img { width: 100%; border-radius: 8px; }
@@ -23,42 +21,42 @@
     <button class="modo-btn" onclick="alternarModo()">Modo: Atacado</button>
   </header>
 
-  <section class="upload-area">
-    <label for="csvInput">Importar produtos (CSV):</label>
-    <input type="file" id="csvInput" accept=".csv" onchange="importarCSV(event)" />
-  </section>
-
   <section class="produtos" id="produtos"></section>
 
   <script>
     let modo = 'atacado';
-    let produtos = [];
+
+    const produtos = [
+      {
+        nome: 'Conjunto Luxo',
+        precoAtacado: 39.90,
+        imagem: 'https://via.placeholder.com/300',
+        tamanhos: ['S', 'M', 'G']
+      },
+      {
+        nome: 'Calcinha Rendada',
+        precoAtacado: 12.50,
+        imagem: 'https://via.placeholder.com/300',
+        tamanhos: ['P', 'M', 'G', 'GG']
+      },
+      {
+        nome: 'Body Transparente',
+        precoAtacado: 45.00,
+        imagem: 'https://via.placeholder.com/300',
+        tamanhos: ['M', 'G', 'GG']
+      },
+      {
+        nome: 'Sutiã Conforto',
+        precoAtacado: 29.90,
+        imagem: 'https://via.placeholder.com/300',
+        tamanhos: ['P', 'M', 'G']
+      }
+    ];
 
     function alternarModo() {
       modo = modo === 'atacado' ? 'varejo' : 'atacado';
       document.querySelector('.modo-btn').textContent = `Modo: ${modo === 'atacado' ? 'Atacado' : 'Varejo'}`;
       renderizarProdutos();
-    }
-
-    function importarCSV(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = function(e) {
-        const linhas = e.target.result.split('\n').filter(l => l.trim() !== '');
-        produtos = linhas.slice(1).map(linha => {
-          const [nome, precoAtacado, imagem, tamanhos] = linha.split(',');
-          return {
-            nome: nome.trim(),
-            precoAtacado: parseFloat(precoAtacado.trim()),
-            imagem: imagem.trim(),
-            tamanhos: tamanhos.trim().split('|')
-          };
-        });
-        renderizarProdutos();
-      };
-
-      reader.readAsText(file);
     }
 
     function renderizarProdutos() {
@@ -83,6 +81,8 @@
         `;
       });
     }
+
+    renderizarProdutos();
   </script>
 </body>
 </html>
