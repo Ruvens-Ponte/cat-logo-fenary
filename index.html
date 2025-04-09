@@ -7,60 +7,39 @@
   <style>
     body { font-family: Arial, sans-serif; padding: 1rem; margin: 0; background: #f9f9f9; }
     header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-    .modo-btn { padding: 0.5rem 1rem; background: black; color: white; border: none; cursor: pointer; border-radius: 8px; margin-top: 1rem; }
-    .produtos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .modo-btn, .carrinho-btn, .btn-pedir, .forma-pagamento-btn {
+      padding: 0.5rem 1rem; background: black; color: white; border: none; cursor: pointer; border-radius: 8px; margin-top: 1rem; margin-right: 0.5rem;
+    }
+    .produtos { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem; }
     .produto { background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .produto img { width: 100%; border-radius: 8px; }
     .preco { font-weight: bold; margin: 0.5rem 0; }
-    .btn-add { background: #007bff; color: white; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 0.5rem; }
-    .carrinho-btn { position: fixed; bottom: 20px; right: 20px; background: #25d366; color: white; padding: 1rem; border: none; border-radius: 50%; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    .quantidade-container { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.5rem; }
-    .quantidade-container label { font-size: 0.9rem; }
-    .quantidade-container input { width: 100%; padding: 0.3rem; border-radius: 5px; border: 1px solid #ccc; }
+    .tamanhos { display: flex; flex-direction: column; margin-bottom: 0.5rem; }
+    .tamanhos label { margin: 0.2rem 0; }
+    .controle { margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
   </style>
 </head>
 <body>
   <header>
     <h1>Catálogo Fenari</h1>
-    <button class="modo-btn" onclick="alternarModo()">Modo: Atacado</button>
+    <div class="controle">
+      <button class="modo-btn" onclick="alternarModo()">Modo: Atacado</button>
+      <button class="carrinho-btn" onclick="finalizarPedido()">🛒 Finalizar Pedido</button>
+    </div>
   </header>
 
   <section class="produtos" id="produtos"></section>
-  <button class="carrinho-btn" onclick="enviarPedido()">🛒</button>
 
   <script>
     let modo = 'atacado';
     let carrinho = [];
+    let formaPagamento = 'Pix';
 
     const produtos = [
-      {
-        id: 1,
-        nome: 'Conjunto Luxo',
-        precoAtacado: 39.90,
-        imagem: 'https://via.placeholder.com/300',
-        tamanhos: ['S', 'M', 'G']
-      },
-      {
-        id: 2,
-        nome: 'Calcinha Rendada',
-        precoAtacado: 12.50,
-        imagem: 'https://via.placeholder.com/300',
-        tamanhos: ['P', 'M', 'G', 'GG']
-      },
-      {
-        id: 3,
-        nome: 'Body Transparente',
-        precoAtacado: 45.00,
-        imagem: 'https://via.placeholder.com/300',
-        tamanhos: ['M', 'G', 'GG']
-      },
-      {
-        id: 4,
-        nome: 'Sutiã Conforto',
-        precoAtacado: 29.90,
-        imagem: 'https://via.placeholder.com/300',
-        tamanhos: ['P', 'M', 'G']
-      }
+      { nome: 'Conjunto Luxo', precoAtacado: 39.90, imagem: 'https://via.placeholder.com/300', tamanhos: ['S', 'M', 'G'] },
+      { nome: 'Calcinha Rendada', precoAtacado: 12.50, imagem: 'https://via.placeholder.com/300', tamanhos: ['P', 'M', 'G', 'GG'] },
+      { nome: 'Body Transparente', precoAtacado: 45.00, imagem: 'https://via.placeholder.com/300', tamanhos: ['M', 'G', 'GG'] },
+      { nome: 'Sutiã Conforto', precoAtacado: 29.90, imagem: 'https://via.placeholder.com/300', tamanhos: ['P', 'M', 'G'] }
     ];
 
     function alternarModo() {
@@ -73,70 +52,82 @@
       const container = document.getElementById('produtos');
       container.innerHTML = '';
 
-      produtos.forEach(produto => {
+      produtos.forEach((produto, index) => {
         const preco = modo === 'atacado' ? produto.precoAtacado : produto.precoAtacado * 2;
-        const tamanhosInputs = produto.tamanhos.map(t => `
-          <label>${t}:
-            <input type="number" min="0" value="0" id="qtd-${produto.id}-${t}" />
-          </label>`).join('');
+        let tamanhosHTML = '';
+        produto.tamanhos.forEach(t => {
+          tamanhosHTML += `
+            <label>${t}: <input type="number" min="0" id="qtd-${index}-${t}" style="width: 50px;" /></label>
+          `;
+        });
 
         container.innerHTML += `
           <div class="produto">
             <img src="${produto.imagem}" alt="${produto.nome}" />
             <h3>${produto.nome}</h3>
             <p class="preco">R$ ${preco.toFixed(2)}</p>
-            <div class="quantidade-container">
-              ${tamanhosInputs}
-            </div>
-            <button class="btn-add" onclick="adicionarAoCarrinho(${produto.id})">Adicionar ao Carrinho</button>
+            <div class="tamanhos">${tamanhosHTML}</div>
+            <button class="btn-pedir" onclick="adicionarCarrinho(${index})">Adicionar ao carrinho</button>
           </div>
         `;
       });
     }
 
-    function adicionarAoCarrinho(produtoId) {
-      const produto = produtos.find(p => p.id === produtoId);
+    function adicionarCarrinho(index) {
+      const produto = produtos[index];
       const preco = modo === 'atacado' ? produto.precoAtacado : produto.precoAtacado * 2;
-      const quantidades = {};
+      let totalQuantidade = 0;
+      let tamanhosSelecionados = {};
 
       produto.tamanhos.forEach(t => {
-        const qtd = parseInt(document.getElementById(`qtd-${produto.id}-${t}`).value);
+        const qtd = parseInt(document.getElementById(`qtd-${index}-${t}`).value || '0');
         if (qtd > 0) {
-          quantidades[t] = qtd;
+          tamanhosSelecionados[t] = qtd;
+          totalQuantidade += qtd;
         }
       });
 
-      if (Object.keys(quantidades).length > 0) {
-        carrinho.push({ produto: produto.nome, preco, quantidades });
-        alert('Adicionado ao carrinho!');
+      if (totalQuantidade > 0) {
+        carrinho.push({ nome: produto.nome, preco, tamanhos: tamanhosSelecionados });
+        alert(`${produto.nome} adicionado ao carrinho.`);
       } else {
-        alert('Selecione ao menos uma quantidade!');
+        alert('Selecione ao menos uma quantidade.');
       }
     }
 
-    function enviarPedido() {
+    function selecionarFormaPagamento(tipo) {
+      formaPagamento = tipo;
+      alert(`Forma de pagamento: ${tipo}`);
+    }
+
+    function finalizarPedido() {
       if (carrinho.length === 0) {
-        alert('Seu carrinho está vazio!');
+        alert('Seu carrinho está vazio.');
         return;
       }
 
-      let mensagem = 'Pedido Fenari:%0A';
+      let mensagem = 'Olá! Gostaria de fazer um pedido:%0A';
       let total = 0;
       carrinho.forEach(item => {
-        mensagem += `\n${item.produto} - R$ ${item.preco.toFixed(2)}\n`;
-        Object.keys(item.quantidades).forEach(t => {
-          mensagem += `  ${t}: ${item.quantidades[t]} un.\n`;
-          total += item.preco * item.quantidades[t];
-        });
+        mensagem += `%0A${item.nome} - R$ ${item.preco.toFixed(2)}`;
+        for (const [tamanho, qtd] of Object.entries(item.tamanhos)) {
+          mensagem += `%0A  Tamanho ${tamanho}: ${qtd}x`;
+        }
+        total += item.preco * Object.values(item.tamanhos).reduce((a, b) => a + b, 0);
       });
+      mensagem += `%0A%0ATotal: R$ ${total.toFixed(2)}%0AForma de pagamento: ${formaPagamento}`;
 
-      mensagem += `\nTotal: R$ ${total.toFixed(2)}\nForma de pagamento:`;
-      const linkWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
-      window.open(linkWhatsApp, '_blank');
+      window.open(`https://wa.me/?text=${mensagem}`, '_blank');
     }
 
     renderizarProdutos();
   </script>
+
+  <div style="margin-top: 2rem;">
+    <p>Escolha a forma de pagamento:</p>
+    <button class="forma-pagamento-btn" onclick="selecionarFormaPagamento('Pix')">Pix</button>
+    <button class="forma-pagamento-btn" onclick="selecionarFormaPagamento('Cartão de Crédito')">Cartão de Crédito</button>
+  </div>
 </body>
 </html>
 
