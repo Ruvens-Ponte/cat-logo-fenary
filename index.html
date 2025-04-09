@@ -12,7 +12,11 @@
     .produto { background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .produto img { width: 100%; border-radius: 8px; }
     .preco { font-weight: bold; margin: 0.5rem 0; }
-    .btn-pedir { background: #25d366; color: white; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+    .btn-add { background: #007bff; color: white; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 0.5rem; }
+    .carrinho-btn { position: fixed; bottom: 20px; right: 20px; background: #25d366; color: white; padding: 1rem; border: none; border-radius: 50%; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    .quantidade-container { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.5rem; }
+    .quantidade-container label { font-size: 0.9rem; }
+    .quantidade-container input { width: 100%; padding: 0.3rem; border-radius: 5px; border: 1px solid #ccc; }
   </style>
 </head>
 <body>
@@ -22,30 +26,36 @@
   </header>
 
   <section class="produtos" id="produtos"></section>
+  <button class="carrinho-btn" onclick="enviarPedido()">🛒</button>
 
   <script>
     let modo = 'atacado';
+    let carrinho = [];
 
     const produtos = [
       {
+        id: 1,
         nome: 'Conjunto Luxo',
         precoAtacado: 39.90,
         imagem: 'https://via.placeholder.com/300',
         tamanhos: ['S', 'M', 'G']
       },
       {
+        id: 2,
         nome: 'Calcinha Rendada',
         precoAtacado: 12.50,
         imagem: 'https://via.placeholder.com/300',
         tamanhos: ['P', 'M', 'G', 'GG']
       },
       {
+        id: 3,
         nome: 'Body Transparente',
         precoAtacado: 45.00,
         imagem: 'https://via.placeholder.com/300',
         tamanhos: ['M', 'G', 'GG']
       },
       {
+        id: 4,
         nome: 'Sutiã Conforto',
         precoAtacado: 29.90,
         imagem: 'https://via.placeholder.com/300',
@@ -65,24 +75,68 @@
 
       produtos.forEach(produto => {
         const preco = modo === 'atacado' ? produto.precoAtacado : produto.precoAtacado * 2;
-        const mensagem = `Produto: ${produto.nome}%0APreço: R$ ${preco.toFixed(2)}%0ATamanhos: ${produto.tamanhos.join(', ')}`;
-        const linkWhatsApp = `https://wa.me/?text=${mensagem}`;
+        const tamanhosInputs = produto.tamanhos.map(t => `
+          <label>${t}:
+            <input type="number" min="0" value="0" id="qtd-${produto.id}-${t}" />
+          </label>`).join('');
 
         container.innerHTML += `
           <div class="produto">
             <img src="${produto.imagem}" alt="${produto.nome}" />
             <h3>${produto.nome}</h3>
             <p class="preco">R$ ${preco.toFixed(2)}</p>
-            <p>Tamanhos: ${produto.tamanhos.join(', ')}</p>
-            <a href="${linkWhatsApp}" target="_blank">
-              <button class="btn-pedir">Pedir via WhatsApp</button>
-            </a>
+            <div class="quantidade-container">
+              ${tamanhosInputs}
+            </div>
+            <button class="btn-add" onclick="adicionarAoCarrinho(${produto.id})">Adicionar ao Carrinho</button>
           </div>
         `;
       });
+    }
+
+    function adicionarAoCarrinho(produtoId) {
+      const produto = produtos.find(p => p.id === produtoId);
+      const preco = modo === 'atacado' ? produto.precoAtacado : produto.precoAtacado * 2;
+      const quantidades = {};
+
+      produto.tamanhos.forEach(t => {
+        const qtd = parseInt(document.getElementById(`qtd-${produto.id}-${t}`).value);
+        if (qtd > 0) {
+          quantidades[t] = qtd;
+        }
+      });
+
+      if (Object.keys(quantidades).length > 0) {
+        carrinho.push({ produto: produto.nome, preco, quantidades });
+        alert('Adicionado ao carrinho!');
+      } else {
+        alert('Selecione ao menos uma quantidade!');
+      }
+    }
+
+    function enviarPedido() {
+      if (carrinho.length === 0) {
+        alert('Seu carrinho está vazio!');
+        return;
+      }
+
+      let mensagem = 'Pedido Fenari:%0A';
+      let total = 0;
+      carrinho.forEach(item => {
+        mensagem += `\n${item.produto} - R$ ${item.preco.toFixed(2)}\n`;
+        Object.keys(item.quantidades).forEach(t => {
+          mensagem += `  ${t}: ${item.quantidades[t]} un.\n`;
+          total += item.preco * item.quantidades[t];
+        });
+      });
+
+      mensagem += `\nTotal: R$ ${total.toFixed(2)}\nForma de pagamento:`;
+      const linkWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+      window.open(linkWhatsApp, '_blank');
     }
 
     renderizarProdutos();
   </script>
 </body>
 </html>
+
