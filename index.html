@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo Fenari</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 1rem; margin: 0; background: #f9f9f9; }
+    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    .modo-btn { padding: 0.5rem 1rem; background: black; color: white; border: none; cursor: pointer; border-radius: 8px; margin-top: 1rem; }
+    .upload-area { margin-top: 1rem; }
+    .produtos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .produto { background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .produto img { width: 100%; border-radius: 8px; }
+    .preco { font-weight: bold; margin: 0.5rem 0; }
+    .btn-pedir { background: #25d366; color: white; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Catálogo Fenari</h1>
+    <button class="modo-btn" onclick="alternarModo()">Modo: Atacado</button>
+  </header>
+
+  <section class="upload-area">
+    <label for="csvInput">Importar produtos (CSV):</label>
+    <input type="file" id="csvInput" accept=".csv" onchange="importarCSV(event)" />
+  </section>
+
+  <section class="produtos" id="produtos"></section>
+
+  <script>
+    let modo = 'atacado';
+    let produtos = [];
+
+    function alternarModo() {
+      modo = modo === 'atacado' ? 'varejo' : 'atacado';
+      document.querySelector('.modo-btn').textContent = `Modo: ${modo === 'atacado' ? 'Atacado' : 'Varejo'}`;
+      renderizarProdutos();
+    }
+
+    function importarCSV(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const linhas = e.target.result.split('\n').filter(l => l.trim() !== '');
+        produtos = linhas.slice(1).map(linha => {
+          const [nome, precoAtacado, imagem, tamanhos] = linha.split(',');
+          return {
+            nome: nome.trim(),
+            precoAtacado: parseFloat(precoAtacado.trim()),
+            imagem: imagem.trim(),
+            tamanhos: tamanhos.trim().split('|')
+          };
+        });
+        renderizarProdutos();
+      };
+
+      reader.readAsText(file);
+    }
+
+    function renderizarProdutos() {
+      const container = document.getElementById('produtos');
+      container.innerHTML = '';
+
+      produtos.forEach(produto => {
+        const preco = modo === 'atacado' ? produto.precoAtacado : produto.precoAtacado * 2;
+        const mensagem = `Produto: ${produto.nome}%0APreço: R$ ${preco.toFixed(2)}%0ATamanhos: ${produto.tamanhos.join(', ')}`;
+        const linkWhatsApp = `https://wa.me/?text=${mensagem}`;
+
+        container.innerHTML += `
+          <div class="produto">
+            <img src="${produto.imagem}" alt="${produto.nome}" />
+            <h3>${produto.nome}</h3>
+            <p class="preco">R$ ${preco.toFixed(2)}</p>
+            <p>Tamanhos: ${produto.tamanhos.join(', ')}</p>
+            <a href="${linkWhatsApp}" target="_blank">
+              <button class="btn-pedir">Pedir via WhatsApp</button>
+            </a>
+          </div>
+        `;
+      });
+    }
+  </script>
+</body>
+</html>
