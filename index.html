@@ -5,197 +5,127 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Catálogo Fenari</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f3f4f6;
-      display: flex;
-    }
-    aside {
-      width: 250px;
-      background-color: #111827;
-      color: white;
-      padding: 1rem;
-      height: 100vh;
-    }
-    aside h2 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    .main {
-      flex-grow: 1;
-      padding: 1rem;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-    .modo-btn {
-      padding: 0.5rem 1rem;
-      background: black;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 8px;
-    }
-    .filtro {
-      margin-top: 1rem;
-    }
-    .filtro input {
-      padding: 0.5rem;
-      width: 100%;
-      border: none;
-      border-radius: 6px;
-    }
-    .produtos {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-    .produto {
-      background: white;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .produto img {
-      width: 100%;
-      border-radius: 8px;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; display: flex; background: #f5f5f5; }
+    .sidebar { width: 250px; background: #fff; padding: 1rem; box-shadow: 2px 0 5px rgba(0,0,0,0.1); height: 100vh; position: sticky; top: 0; }
+    .sidebar h2 { font-size: 1.2rem; margin-bottom: 1rem; }
+    .sidebar label { display: block; margin-top: 0.5rem; }
+    .main { flex: 1; padding: 1rem; }
+    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    .modo-btn { padding: 0.5rem 1rem; background: black; color: white; border: none; cursor: pointer; border-radius: 8px; }
+    .produtos { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+    .produto { background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; }
+    .produto img { width: 100%; border-radius: 8px; height: 200px; object-fit: cover; }
     .preco { font-weight: bold; margin: 0.5rem 0; }
-    .btn-pedir, .finalizar {
-      background: #25d366;
-      color: white;
-      padding: 0.5rem;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 0.5rem;
-    }
-    .qtd-input {
-      width: 60px;
-      margin-left: 10px;
-    }
-    .carrinho, .pagamento {
-      margin-top: 1rem;
-      background: white;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
+    .btn-pedir { background: #25d366; color: white; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 0.5rem; }
+    .quantidade { display: flex; flex-direction: column; margin-top: 0.5rem; }
+    .quantidade label { font-size: 0.9rem; }
+    .quantidade input { width: 100%; padding: 0.3rem; margin-top: 0.3rem; margin-bottom: 0.5rem; }
+    .search { padding: 0.5rem; width: 100%; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
-  <aside>
-    <h2>Catálogo Fenari</h2>
-    <div class="filtro">
-      <input type="text" id="pesquisa" placeholder="Buscar produto..." oninput="filtrarProdutos()" />
-    </div>
-  </aside>
+  <div class="sidebar">
+    <h2>Filtros</h2>
+    <input type="text" id="busca" class="search" placeholder="Buscar produto..." oninput="filtrarProdutos()">
+    <label>Categoria:
+      <select id="filtroCategoria" onchange="filtrarProdutos()">
+        <option value="">Todas</option>
+        <option value="Conjunto">Conjunto</option>
+        <option value="Calcinha">Calcinha</option>
+        <option value="Body">Body</option>
+        <option value="Sutiã">Sutiã</option>
+      </select>
+    </label>
+    <label>Cor:
+      <select id="filtroCor" onchange="filtrarProdutos()">
+        <option value="">Todas</option>
+        <option value="Preto">Preto</option>
+        <option value="Vermelho">Vermelho</option>
+        <option value="Bege">Bege</option>
+      </select>
+    </label>
+    <label>Tamanho:
+      <select id="filtroTamanho" onchange="filtrarProdutos()">
+        <option value="">Todos</option>
+        <option value="P">P</option>
+        <option value="M">M</option>
+        <option value="G">G</option>
+        <option value="GG">GG</option>
+      </select>
+    </label>
+  </div>
+
   <div class="main">
     <header>
+      <h1>Catálogo Fenari</h1>
       <button class="modo-btn" onclick="alternarModo()">Modo: Atacado</button>
     </header>
     <section class="produtos" id="produtos"></section>
-    <div class="pagamento">
-      <label>Forma de Pagamento:</label><br>
-      <input type="radio" name="pagamento" value="Pix" checked> Pix
-      <input type="radio" name="pagamento" value="Cartão de Crédito"> Cartão de Crédito
-    </div>
-    <div class="carrinho">
-      <button class="finalizar" onclick="finalizarPedido()">Finalizar Pedido no WhatsApp</button>
-    </div>
   </div>
 
   <script>
     let modo = 'atacado';
-    let carrinho = [];
 
     const produtos = [
-      { nome: 'Conjunto Luxo', precoAtacado: 39.90, imagem: 'https://via.placeholder.com/300', tamanhos: ['S', 'M', 'G'] },
-      { nome: 'Calcinha Rendada', precoAtacado: 12.50, imagem: 'https://via.placeholder.com/300', tamanhos: ['P', 'M', 'G', 'GG'] },
-      { nome: 'Body Transparente', precoAtacado: 45.00, imagem: 'https://via.placeholder.com/300', tamanhos: ['M', 'G', 'GG'] },
-      { nome: 'Sutiã Conforto', precoAtacado: 29.90, imagem: 'https://via.placeholder.com/300', tamanhos: ['P', 'M', 'G'] }
+      { nome: 'Conjunto Luxo', categoria: 'Conjunto', cor: 'Preto', precoAtacado: 39.90, imagem: 'https://via.placeholder.com/300', tamanhos: ['S', 'M', 'G'] },
+      { nome: 'Calcinha Rendada', categoria: 'Calcinha', cor: 'Vermelho', precoAtacado: 12.50, imagem: 'https://via.placeholder.com/300', tamanhos: ['P', 'M', 'G', 'GG'] },
+      { nome: 'Body Transparente', categoria: 'Body', cor: 'Bege', precoAtacado: 45.00, imagem: 'https://via.placeholder.com/300', tamanhos: ['M', 'G', 'GG'] },
+      { nome: 'Sutiã Conforto', categoria: 'Sutiã', cor: 'Preto', precoAtacado: 29.90, imagem: 'https://via.placeholder.com/300', tamanhos: ['P', 'M', 'G'] }
     ];
 
     function alternarModo() {
       modo = modo === 'atacado' ? 'varejo' : 'atacado';
       document.querySelector('.modo-btn').textContent = `Modo: ${modo === 'atacado' ? 'Atacado' : 'Varejo'}`;
-      renderizarProdutos();
+      filtrarProdutos();
     }
 
-    function renderizarProdutos(filtro = '') {
+    function filtrarProdutos() {
+      const termo = document.getElementById('busca').value.toLowerCase();
+      const cat = document.getElementById('filtroCategoria').value;
+      const cor = document.getElementById('filtroCor').value;
+      const tamanho = document.getElementById('filtroTamanho').value;
       const container = document.getElementById('produtos');
       container.innerHTML = '';
 
-      produtos.filter(p => p.nome.toLowerCase().includes(filtro.toLowerCase())).forEach((produto, index) => {
+      produtos.filter(p => {
+        const matchNome = p.nome.toLowerCase().includes(termo);
+        const matchCategoria = !cat || p.categoria === cat;
+        const matchCor = !cor || p.cor === cor;
+        const matchTamanho = !tamanho || p.tamanhos.includes(tamanho);
+        return matchNome && matchCategoria && matchCor && matchTamanho;
+      }).forEach(produto => {
         const preco = modo === 'atacado' ? produto.precoAtacado : produto.precoAtacado * 2;
-        let tamanhosHtml = produto.tamanhos.map(t => `
-          <label>${t}
-            <input type="number" min="0" value="0" class="qtd-input" id="prod-${index}-tam-${t}" />
-          </label><br>
-        `).join('');
+
+        let inputsTamanho = '';
+        produto.tamanhos.forEach(t => {
+          inputsTamanho += `<label>${t}: <input type='number' min='0' id='${produto.nome}-${t}' /></label>`;
+        });
+
+        const mensagemBase = encodeURIComponent(`Produto: ${produto.nome}\nPreço: R$ ${preco.toFixed(2)}`);
+        const linkWhatsApp = `https://wa.me/?text=${mensagemBase}`;
 
         container.innerHTML += `
           <div class="produto">
             <img src="${produto.imagem}" alt="${produto.nome}" />
             <h3>${produto.nome}</h3>
             <p class="preco">R$ ${preco.toFixed(2)}</p>
-            <p>Tamanhos:</p>
-            ${tamanhosHtml}
-            <button class="btn-pedir" onclick="adicionarCarrinho(${index})">Adicionar ao Carrinho</button>
+            <p>Cor: ${produto.cor}</p>
+            <div class="quantidade">${inputsTamanho}</div>
+            <label>Forma de pagamento:
+              <select>
+                <option>Pix</option>
+                <option>Cartão de Crédito</option>
+              </select>
+            </label>
+            <a href="${linkWhatsApp}" target="_blank">
+              <button class="btn-pedir">Pedir via WhatsApp</button>
+            </a>
           </div>
         `;
       });
     }
 
-    function adicionarCarrinho(index) {
-      const produto = produtos[index];
-      const preco = modo === 'atacado' ? produto.precoAtacado : produto.precoAtacado * 2;
-      const item = { nome: produto.nome, preco: preco, tamanhos: [] };
-
-      produto.tamanhos.forEach(t => {
-        const qtd = parseInt(document.getElementById(`prod-${index}-tam-${t}`).value);
-        if (qtd > 0) item.tamanhos.push({ tamanho: t, qtd });
-      });
-
-      if (item.tamanhos.length > 0) {
-        carrinho.push(item);
-        alert('Produto adicionado ao carrinho!');
-      } else {
-        alert('Informe ao menos uma quantidade para adicionar ao carrinho.');
-      }
-    }
-
-    function finalizarPedido() {
-      const formaPagamento = document.querySelector('input[name="pagamento"]:checked').value;
-      let mensagem = `*Pedido Fenari*%0AForma de pagamento: ${formaPagamento}%0A`;
-      let total = 0;
-
-      carrinho.forEach(item => {
-        mensagem += `\nProduto: ${item.nome}\n`;
-        item.tamanhos.forEach(t => {
-          mensagem += `Tamanho: ${t.tamanho} - Qtd: ${t.qtd}\n`;
-          total += item.preco * t.qtd;
-        });
-        mensagem += `Subtotal: R$ ${(item.preco * item.tamanhos.reduce((s, t) => s + t.qtd, 0)).toFixed(2)}\n`;
-      });
-
-      mensagem += `\n*Total: R$ ${total.toFixed(2)}*`;
-      const link = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
-      window.open(link, '_blank');
-    }
-
-    function filtrarProdutos() {
-      const filtro = document.getElementById('pesquisa').value;
-      renderizarProdutos(filtro);
-    }
-
-    renderizarProdutos();
+    filtrarProdutos();
   </script>
 </body>
 </html>
