@@ -5,118 +5,221 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Catálogo Fenari</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; display: flex; background: #f5f5f5; }
-    .sidebar { width: 250px; background: #fff; padding: 1rem; box-shadow: 2px 0 5px rgba(0,0,0,0.1); height: 100vh; position: sticky; top: 0; }
-    .sidebar h2 { font-size: 1.2rem; margin-bottom: 1rem; }
-    .sidebar label { display: block; margin-top: 0.5rem; }
-    .main { flex: 1; padding: 1rem; }
-    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
-    .modo-btn { padding: 0.5rem 1rem; background: black; color: white; border: none; cursor: pointer; border-radius: 8px; }
-    .produtos { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-    .produto { background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; }
-    .produto img { width: 100%; border-radius: 8px; height: 200px; object-fit: cover; }
-    .preco { font-weight: bold; margin: 0.5rem 0; }
-    .btn-pedir { background: #25d366; color: white; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 0.5rem; }
-    .quantidade { display: flex; flex-direction: column; margin-top: 0.5rem; }
-    .quantidade label { font-size: 0.9rem; }
-    .quantidade input { width: 100%; padding: 0.3rem; margin-top: 0.3rem; margin-bottom: 0.5rem; }
-    .search { padding: 0.5rem; width: 100%; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 1rem; }
+    :root {
+      --cor-primaria: #000000;
+      --cor-secundaria: #d4af37;
+      --cor-fundo: #f9f9f9;
+      --cor-texto: #333;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      background: var(--cor-fundo);
+    }
+
+    aside {
+      width: 250px;
+      background: var(--cor-primaria);
+      color: white;
+      padding: 1rem;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+
+    aside h2 {
+      margin-top: 0;
+      color: var(--cor-secundaria);
+    }
+
+    aside label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+    }
+
+    aside input,
+    aside select {
+      width: 100%;
+      padding: 0.3rem;
+      margin-bottom: 1rem;
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 1rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .modo-btn {
+      padding: 0.5rem 1rem;
+      background: var(--cor-primaria);
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    .produtos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .produto {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .produto img {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .preco {
+      font-weight: bold;
+      margin: 0.5rem 0;
+    }
+
+    .btn-pedir {
+      background: #25d366;
+      color: white;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .forma-pagamento {
+      margin: 1rem 0;
+    }
   </style>
 </head>
 <body>
-  <div class="sidebar">
+  <aside>
     <h2>Filtros</h2>
-    <input type="text" id="busca" class="search" placeholder="Buscar produto..." oninput="filtrarProdutos()">
-    <label>Categoria:
-      <select id="filtroCategoria" onchange="filtrarProdutos()">
-        <option value="">Todas</option>
-        <option value="Conjunto">Conjunto</option>
-        <option value="Calcinha">Calcinha</option>
-        <option value="Body">Body</option>
-        <option value="Sutiã">Sutiã</option>
-      </select>
-    </label>
-    <label>Cor:
-      <select id="filtroCor" onchange="filtrarProdutos()">
-        <option value="">Todas</option>
-        <option value="Preto">Preto</option>
-        <option value="Vermelho">Vermelho</option>
-        <option value="Bege">Bege</option>
-      </select>
-    </label>
-    <label>Tamanho:
-      <select id="filtroTamanho" onchange="filtrarProdutos()">
-        <option value="">Todos</option>
-        <option value="P">P</option>
-        <option value="M">M</option>
-        <option value="G">G</option>
-        <option value="GG">GG</option>
-      </select>
-    </label>
-  </div>
+    <label>Buscar:</label>
+    <input type="text" id="busca" oninput="filtrarProdutos()">
 
-  <div class="main">
+    <label>Categoria:</label>
+    <select id="filtro-categoria" onchange="filtrarProdutos()">
+      <option value="">Todas</option>
+      <option value="conjunto">Conjunto</option>
+      <option value="calcinha">Calcinha</option>
+      <option value="body">Body</option>
+      <option value="sutia">Sutiã</option>
+    </select>
+
+    <label>Cor:</label>
+    <select id="filtro-cor" onchange="filtrarProdutos()">
+      <option value="">Todas</option>
+      <option value="preto">Preto</option>
+      <option value="vermelho">Vermelho</option>
+      <option value="bege">Bege</option>
+    </select>
+
+    <label>Tamanho:</label>
+    <select id="filtro-tamanho" onchange="filtrarProdutos()">
+      <option value="">Todos</option>
+      <option value="P">P</option>
+      <option value="M">M</option>
+      <option value="G">G</option>
+      <option value="GG">GG</option>
+    </select>
+  </aside>
+
+  <main>
     <header>
-      <h1>Catálogo Fenari</h1>
+      <h1 style="color: var(--cor-primaria)">Catálogo Fenari</h1>
       <button class="modo-btn" onclick="alternarModo()">Modo: Atacado</button>
     </header>
+
+    <section class="forma-pagamento">
+      <label>Forma de pagamento:</label><br>
+      <input type="radio" name="pagamento" value="Pix" checked> Pix
+      <input type="radio" name="pagamento" value="Cartão de Crédito"> Cartão de Crédito
+    </section>
+
     <section class="produtos" id="produtos"></section>
-  </div>
+  </main>
 
   <script>
     let modo = 'atacado';
-
-    const produtos = [
-      { nome: 'Conjunto Luxo', categoria: 'Conjunto', cor: 'Preto', precoAtacado: 39.90, imagem: 'https://via.placeholder.com/300', tamanhos: ['S', 'M', 'G'] },
-      { nome: 'Calcinha Rendada', categoria: 'Calcinha', cor: 'Vermelho', precoAtacado: 12.50, imagem: 'https://via.placeholder.com/300', tamanhos: ['P', 'M', 'G', 'GG'] },
-      { nome: 'Body Transparente', categoria: 'Body', cor: 'Bege', precoAtacado: 45.00, imagem: 'https://via.placeholder.com/300', tamanhos: ['M', 'G', 'GG'] },
-      { nome: 'Sutiã Conforto', categoria: 'Sutiã', cor: 'Preto', precoAtacado: 29.90, imagem: 'https://via.placeholder.com/300', tamanhos: ['P', 'M', 'G'] }
+    let produtos = [
+      {
+        nome: 'Conjunto Luxo', categoria: 'conjunto', cor: 'preto',
+        precoAtacado: 39.90,
+        imagem: 'https://via.placeholder.com/300',
+        tamanhos: ['S', 'M', 'G']
+      },
+      {
+        nome: 'Calcinha Rendada', categoria: 'calcinha', cor: 'vermelho',
+        precoAtacado: 12.50,
+        imagem: 'https://via.placeholder.com/300',
+        tamanhos: ['P', 'M', 'G', 'GG']
+      },
+      {
+        nome: 'Body Transparente', categoria: 'body', cor: 'bege',
+        precoAtacado: 45.00,
+        imagem: 'https://via.placeholder.com/300',
+        tamanhos: ['M', 'G', 'GG']
+      },
+      {
+        nome: 'Sutiã Conforto', categoria: 'sutia', cor: 'preto',
+        precoAtacado: 29.90,
+        imagem: 'https://via.placeholder.com/300',
+        tamanhos: ['P', 'M', 'G']
+      }
     ];
 
     function alternarModo() {
       modo = modo === 'atacado' ? 'varejo' : 'atacado';
       document.querySelector('.modo-btn').textContent = `Modo: ${modo === 'atacado' ? 'Atacado' : 'Varejo'}`;
-      filtrarProdutos();
+      renderizarProdutos();
     }
 
     function filtrarProdutos() {
-      const termo = document.getElementById('busca').value.toLowerCase();
-      const cat = document.getElementById('filtroCategoria').value;
-      const cor = document.getElementById('filtroCor').value;
-      const tamanho = document.getElementById('filtroTamanho').value;
+      const busca = document.getElementById('busca').value.toLowerCase();
+      const cat = document.getElementById('filtro-categoria').value;
+      const cor = document.getElementById('filtro-cor').value;
+      const tam = document.getElementById('filtro-tamanho').value;
+
+      const filtrados = produtos.filter(p => {
+        const buscaOk = p.nome.toLowerCase().includes(busca);
+        const catOk = cat === '' || p.categoria === cat;
+        const corOk = cor === '' || p.cor === cor;
+        const tamOk = tam === '' || p.tamanhos.includes(tam);
+        return buscaOk && catOk && corOk && tamOk;
+      });
+
+      renderizarProdutos(filtrados);
+    }
+
+    function renderizarProdutos(lista = produtos) {
       const container = document.getElementById('produtos');
       container.innerHTML = '';
 
-      produtos.filter(p => {
-        const matchNome = p.nome.toLowerCase().includes(termo);
-        const matchCategoria = !cat || p.categoria === cat;
-        const matchCor = !cor || p.cor === cor;
-        const matchTamanho = !tamanho || p.tamanhos.includes(tamanho);
-        return matchNome && matchCategoria && matchCor && matchTamanho;
-      }).forEach(produto => {
+      lista.forEach(produto => {
         const preco = modo === 'atacado' ? produto.precoAtacado : produto.precoAtacado * 2;
-
-        let inputsTamanho = '';
-        produto.tamanhos.forEach(t => {
-          inputsTamanho += `<label>${t}: <input type='number' min='0' id='${produto.nome}-${t}' /></label>`;
-        });
-
-        const mensagemBase = encodeURIComponent(`Produto: ${produto.nome}\nPreço: R$ ${preco.toFixed(2)}`);
-        const linkWhatsApp = `https://wa.me/?text=${mensagemBase}`;
+        const mensagem = `Produto: ${produto.nome}%0APreço: R$ ${preco.toFixed(2)}%0ATamanhos: ${produto.tamanhos.join(', ')}`;
+        const linkWhatsApp = `https://wa.me/?text=${mensagem}`;
 
         container.innerHTML += `
           <div class="produto">
             <img src="${produto.imagem}" alt="${produto.nome}" />
             <h3>${produto.nome}</h3>
             <p class="preco">R$ ${preco.toFixed(2)}</p>
-            <p>Cor: ${produto.cor}</p>
-            <div class="quantidade">${inputsTamanho}</div>
-            <label>Forma de pagamento:
-              <select>
-                <option>Pix</option>
-                <option>Cartão de Crédito</option>
-              </select>
-            </label>
+            <p>Tamanhos: ${produto.tamanhos.join(', ')}</p>
             <a href="${linkWhatsApp}" target="_blank">
               <button class="btn-pedir">Pedir via WhatsApp</button>
             </a>
@@ -125,7 +228,7 @@
       });
     }
 
-    filtrarProdutos();
+    renderizarProdutos();
   </script>
 </body>
 </html>
